@@ -9,3 +9,14 @@
 /Users/joseph/Desktop/btc_hw/BitApp/obj/Debug/netcoreapp2.1/BitApp.AssemblyInfo.cs
 /Users/joseph/Desktop/btc_hw/BitApp/obj/Debug/netcoreapp2.1/BitApp.dll
 /Users/joseph/Desktop/btc_hw/BitApp/obj/Debug/netcoreapp2.1/BitApp.pdb
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\bin\Debug\netcoreapp2.1\BitApp.deps.json
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\bin\Debug\netcoreapp2.1\BitApp.runtimeconfig.json
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\bin\Debug\netcoreapp2.1\BitApp.runtimeconfig.dev.json
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\bin\Debug\netcoreapp2.1\BitApp.dll
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\bin\Debug\netcoreapp2.1\BitApp.pdb
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\obj\Debug\netcoreapp2.1\BitApp.csprojAssemblyReference.cache
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\obj\Debug\netcoreapp2.1\BitApp.csproj.CoreCompileInputs.cache
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\obj\Debug\netcoreapp2.1\BitApp.AssemblyInfoInputs.cache
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\obj\Debug\netcoreapp2.1\BitApp.AssemblyInfo.cs
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\obj\Debug\netcoreapp2.1\BitApp.dll
+E:\Documents\Coursework\4_Blockchain\coding_asgn\BlockchainTest\BitApp\obj\Debug\netcoreapp2.1\BitApp.pdb
