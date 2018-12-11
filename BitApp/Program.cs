@@ -1,6 +1,7 @@
 ﻿using System;
 using NBitcoin;
 using QBitNinja.Client;
+using System.Collections.Generic;
 
 namespace BitApp
 {
@@ -35,15 +36,9 @@ namespace BitApp
             var address = publicKey.GetAddress(Network.TestNet);
             var paymentScript = publicKeyHash.ScriptPubKey;  // https://programmingblockchain.gitbook.io/programmingblockchain/bitcoin_transfer/payment_script
 
-
-            
-
             Console.WriteLine("Public Key: " + publicKey);
             Console.WriteLine("Address: " + address.ToString());
             Console.WriteLine("Private Key Bitcoin secret: " + bitcoinSecretKey);
-
-
-            genVanityAddress("mxR", 3);
 
             System.IO.StreamWriter file = new System.IO.StreamWriter("Generated_Addresses.txt");
             file.WriteLine("Private Key: " + bitcoinSecretKey);
@@ -54,8 +49,10 @@ namespace BitApp
             file.Close();
 
             
-            
-            
+            //genVanityAddress("mmanwa", 6);
+            //getMainNetTransactionInfo();
+            getTestnetAddressInfo("n2obaQd1r3so39PFLMMm7yK4b146oK4Zpq");
+            getTestnetAdressUnspentBalance("n2obaQd1r3so39PFLMMm7yK4b146oK4Zpq");
             
             
             
@@ -64,9 +61,9 @@ namespace BitApp
         }
 
         static void genVanityAddress(string vanity, int len) {
-            if (len>4) {
-                Console.WriteLine("You are too ambitious. Setting length to 5.");
-                len=4;
+            if (len>7) {
+                Console.WriteLine("You are too ambitious. Setting length to 7.");
+                len=7;
             }
             if (len > vanity.Length) {
                 len = vanity.Length;
@@ -168,6 +165,116 @@ namespace BitApp
             return false;
         }
 
+        static void getMainNetTransactionInfo() {
+            QBitNinjaClient client = new QBitNinjaClient(Network.Main);
+            // Parse transaction id to NBitcoin.uint256 so the client can eat it
+            var transactionId = uint256.Parse("8678423e9437501e8c6c536b80240f101a74510331b7b1c09a6aa6c54aeb433e");
+            QBitNinja.Client.Models.GetTransactionResponse transactionResponse = client.GetTransaction(transactionId).Result;
+
+            NBitcoin.Transaction transaction = transactionResponse.Transaction;
+
+            Console.WriteLine("\n========================================================");
+            Console.WriteLine("Information for transiction id: " + transactionResponse.TransactionId); 
+
+
+            // Received coins:
+            Console.WriteLine("Received coins: ");
+            List<ICoin> receivedCoins = transactionResponse.ReceivedCoins;
+            Money total_received = 0;
+            foreach (var coin in receivedCoins)
+            {
+                Money amount = (Money) coin.Amount;
+                var paymentScript = coin.TxOut.ScriptPubKey;
+                var address = paymentScript.GetDestinationAddress(Network.Main);
+                Console.WriteLine("\tAmount [BTC]: " + amount.ToDecimal(MoneyUnit.BTC) + ". Destination address:" + address);
+                total_received+= amount;
+            }
+            Console.WriteLine("Total amount received [BTC]: " + total_received.ToDecimal(MoneyUnit.BTC));
+            Console.WriteLine();
+
+
+            // Spent coins:
+            Console.WriteLine("Spent coins: ");
+            List<ICoin> spentCoins = transactionResponse.SpentCoins;
+            Money total_spent = 0;
+            foreach (var coin in spentCoins)
+            {
+                Money amount = (Money) coin.Amount;
+                var paymentScript = coin.TxOut.ScriptPubKey;
+                var address = paymentScript.GetDestinationAddress(Network.Main);
+                Console.WriteLine("\tAmount [BTC]: " + amount.ToDecimal(MoneyUnit.BTC) + ". Destination address:" + address);
+                total_spent+= amount;
+            }
+            Console.WriteLine("Total amount spent [BTC]: " + total_spent.ToDecimal(MoneyUnit.BTC));
+            Console.WriteLine();
+
+            var fee = transaction.GetFee(spentCoins.ToArray());
+            Console.WriteLine("Transaction fee [BTC]: " + fee.ToDecimal(MoneyUnit.BTC));
+        }
+
+
+        static void getTestnetAddressInfo(string addressString) {
+            QBitNinjaClient client = new QBitNinjaClient(Network.TestNet);
+
+            var wAddress = BitcoinAddress.Create(addressString, Network.TestNet);
+
+
+            
+            
+            
+            QBitNinja.Client.Models.BalanceModel balanceModel = client.GetBalance(wAddress, false).Result;
+            QBitNinja.Client.Models.BalanceSummary balanceSummary = client.GetBalanceSummary(wAddress).Result;
+
+            
+
+            Console.WriteLine("\n========================================================");
+            Console.WriteLine("Information for address id: " + wAddress.ToString()); 
+            Console.WriteLine("Balance Spendable amount [BTC]: " + balanceSummary.Spendable.Amount.ToString());
+            Console.WriteLine("Total number of operations: " + balanceModel.Operations.Count);
+
+            var opCount = 0;
+            foreach (var operation in balanceModel.Operations) {
+                opCount++;
+                Console.WriteLine("\tOperation " + opCount + ": Spent coins: " + operation.SpentCoins.Count + " Received coins: " + operation.ReceivedCoins.Count);
+                foreach (var coin in operation.ReceivedCoins) {
+                    Money amount = (Money) coin.Amount;
+                    var paymentScript = coin.TxOut.ScriptPubKey;
+                    var address = paymentScript.GetDestinationAddress(Network.TestNet);
+                    Console.WriteLine("\t\tReceived Amount [BTC]: " + amount.ToDecimal(MoneyUnit.BTC));
+                }
+
+                foreach (var coin in operation.SpentCoins) {
+                    Money amount = (Money) coin.Amount;
+                    var paymentScript = coin.TxOut.ScriptPubKey;
+                    var address = paymentScript.GetDestinationAddress(Network.TestNet);
+                    Console.WriteLine("\t\tSpent Amount [BTC]: " + amount.ToDecimal(MoneyUnit.BTC));
+                }
+            }
+        }
+
+        static void getTestnetAdressUnspentBalance(string addressString) {
+            QBitNinjaClient client = new QBitNinjaClient(Network.TestNet);
+
+            var wAddress = BitcoinAddress.Create(addressString, Network.TestNet);
+            QBitNinja.Client.Models.BalanceModel balanceModel = client.GetBalance(wAddress, true).Result;
+
+            Console.WriteLine("\n========================================================");
+            Console.WriteLine("Unspent Transaction outputs in : " + wAddress.ToString()); 
+            
+            List<ICoin> receivedCoins = new List<ICoin>();
+            receivedCoins.Clear();
+            foreach (var operation in balanceModel.Operations) {
+                receivedCoins.AddRange(operation.ReceivedCoins);
+            }
+            Console.WriteLine("Number of UTXOs: " + receivedCoins.Count);
+            foreach (var coin in receivedCoins) {
+                Money amount = (Money) coin.Amount;
+                var paymentScript = coin.TxOut.ScriptPubKey;
+                var address = paymentScript.GetDestinationAddress(Network.TestNet);
+                Console.WriteLine("\tUnspent output: In transaction: " +  coin.Outpoint.Hash + ", Amount [BTC]: " + amount.ToDecimal(MoneyUnit.BTC));
+            }
+               
+        }
 
     }
 }

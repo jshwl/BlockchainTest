@@ -1,0 +1,3 @@
+Private Key: NBitcoin.Key
+Public key: 03bfcde116ee03d018a7f8d43570f25185db9e3693670a1f439839ee63474a0903
+Address: mxrARR3YfxtCv7EZwaFtFd3asa8rxFM1oP
