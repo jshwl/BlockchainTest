@@ -3676,11 +3676,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/joseph/Desktop/btc_hw/BitApp/BitApp.csproj",
+      "projectUniqueName": "/Users/joseph/Desktop/btc/BlockchainTest/BitApp/BitApp.csproj",
       "projectName": "BitApp",
-      "projectPath": "/Users/joseph/Desktop/btc_hw/BitApp/BitApp.csproj",
+      "projectPath": "/Users/joseph/Desktop/btc/BlockchainTest/BitApp/BitApp.csproj",
       "packagesPath": "/Users/joseph/.nuget/packages/",
-      "outputPath": "/Users/joseph/Desktop/btc_hw/BitApp/obj/",
+      "outputPath": "/Users/joseph/Desktop/btc/BlockchainTest/BitApp/obj/",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
