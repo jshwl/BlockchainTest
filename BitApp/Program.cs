@@ -51,9 +51,13 @@ namespace BitApp
             
             //genVanityAddress("mmanwa", 6);
             //getMainNetTransactionInfo();
-            getTestnetAddressInfo("n2obaQd1r3so39PFLMMm7yK4b146oK4Zpq");
-            getTestnetAdressUnspentBalance("n2obaQd1r3so39PFLMMm7yK4b146oK4Zpq");
-            
+            // Our copay address with a few transactions:  n2obaQd1r3so39PFLMMm7yK4b146oK4Zpq
+            // Other copay addresses: muGuZLu5ZbgsGK3L8M1cnmznSupe7ahh6c
+            // Our address created with code that has some money in it: mtWoNV36TuoNzQDsfejZEoQAQhWxbnEfT2
+            getTestnetAddressInfo("mtWoNV36TuoNzQDsfejZEoQAQhWxbnEfT2");
+            getTestnetAdressUnspentBalance("mtWoNV36TuoNzQDsfejZEoQAQhWxbnEfT2");
+
+            //sendMoney();
             
             
             
@@ -274,6 +278,99 @@ namespace BitApp
                 Console.WriteLine("\tUnspent output: In transaction: " +  coin.Outpoint.Hash + ", Amount [BTC]: " + amount.ToDecimal(MoneyUnit.BTC));
             }
                
+        }
+
+
+        static void sendMoney(/*string fromPrivateKey, string toPublicKey, double amount*/) {
+            BitcoinSecret bitcoinPrivateKey = new BitcoinSecret("cS2U4Nz7tjn2SeUJaqQ3VnUrVXjVWPZG4KJmb3ecPa7YWuJwoh37");
+            var network = bitcoinPrivateKey.Network;
+            var address = bitcoinPrivateKey.GetAddress();
+
+            var client = new QBitNinjaClient(network);
+            var transactionId = uint256.Parse("ccc50aafe5b106f9ef7942e226a16b16614f25dee2c54f97d0a326626381d319");
+            var transactionResponse = client.GetTransaction(transactionId).Result;
+            
+            Console.WriteLine("Transaction ID: " + transactionResponse.TransactionId); 
+            Console.WriteLine("Block confirmaitions: " + transactionResponse.Block.Confirmations); 
+
+
+            var receivedCoins = transactionResponse.ReceivedCoins;
+            OutPoint outPointToSpend = null;
+            foreach (var coin in receivedCoins)
+            {
+                if (coin.TxOut.ScriptPubKey == bitcoinPrivateKey.ScriptPubKey)
+                {
+                    outPointToSpend = coin.Outpoint;
+                }
+            }
+            if(outPointToSpend == null)
+                throw new Exception("TxOut doesn't contain our ScriptPubKey");
+            Console.WriteLine("We want to spend {0}. outpoint:", outPointToSpend.N + 1);
+
+            var transaction = Transaction.Create(network);
+            transaction.Inputs.Add(new TxIn()
+            {
+                PrevOut = outPointToSpend
+            });
+            var hallOfTheMakersAddress = BitcoinAddress.Create("muGuZLu5ZbgsGK3L8M1cnmznSupe7ahh6c", Network.TestNet);
+
+            
+            // How much you want to spend
+            var hallOfTheMakersAmount = new Money(0.0004m, MoneyUnit.BTC);
+            // How much miner fee you want to pay
+            /* Depending on the market price and
+            * the currently advised mining fee,
+            * you may consider to increase or decrease it.
+            */
+            var minerFee = new Money(0.00007m, MoneyUnit.BTC);
+            // How much you want to get back as change
+            var txInAmount = (Money)receivedCoins[(int) outPointToSpend.N].Amount;
+            var changeAmount = txInAmount - hallOfTheMakersAmount - minerFee;
+
+            TxOut hallOfTheMakersTxOut = new TxOut()
+            {
+                Value = hallOfTheMakersAmount,
+                ScriptPubKey = hallOfTheMakersAddress.ScriptPubKey
+            };
+            TxOut changeTxOut = new TxOut()
+            {
+                Value = changeAmount,
+                ScriptPubKey = bitcoinPrivateKey.ScriptPubKey
+            };
+
+            transaction.Outputs.Add(hallOfTheMakersTxOut);
+            transaction.Outputs.Add(changeTxOut);
+
+            
+            // Message
+            var message = "Long live NBitcoin and its makers!";
+            var bytes = System.Text.Encoding.UTF8.GetBytes(message);
+            transaction.Outputs.Add(new TxOut()
+            {
+                Value = Money.Zero,
+                ScriptPubKey = TxNullDataTemplate.Instance.GenerateScriptPubKey(bytes)
+            });
+
+            
+
+            // Signing
+            transaction.Inputs[0].ScriptSig =  bitcoinPrivateKey.ScriptPubKey;
+            transaction.Sign(bitcoinPrivateKey, receivedCoins.ToArray());
+
+
+
+            QBitNinja.Client.Models.BroadcastResponse broadcastResponse = client.Broadcast(transaction).Result;
+            if (!broadcastResponse.Success)
+            {
+                Console.Error.WriteLine("ErrorCode: " + broadcastResponse.Error.ErrorCode);
+                Console.Error.WriteLine("Error message: " + broadcastResponse.Error.Reason);
+            }
+            else
+            {
+                Console.WriteLine("Success! You can check out the hash of the transaciton in any block explorer:");
+                Console.WriteLine(transaction.GetHash());
+            }
+
         }
 
     }
