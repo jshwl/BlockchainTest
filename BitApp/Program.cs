@@ -10,58 +10,87 @@ namespace BitApp
         static void Main(string[] args)
         {
 
-            // Test net
-            // Console.WriteLine("\n\n--------------------------------------------\n\n");
-            // Console.WriteLine("Test net");
-            // BitcoinSecret old_bitcoinSecretKey = new BitcoinSecret("cS2U4Nz7tjn2SeUJaqQ3VnUrVXjVWPZG4KJmb3ecPa7YWuJwoh37");
-            // byte[] byteArray = old_bitcoinSecretKey.PrivateKey.ToBytes();
-            // //byteArray[0] = 0;
-            // //byteArray[1] = 223;
-            // NBitcoin.DataEncoders.Base58Encoder encoder = new NBitcoin.DataEncoders.Base58Encoder();
-            // String str_base58 = encoder.EncodeData(byteArray, 0, byteArray.Length);
-            // Console.WriteLine("Base58 string: " + str_base58);
-            // Console.WriteLine("Byte array len: " + byteArray.Length);
-            // Key computedPrivKey = new Key(byteArray);
-            // BitcoinSecret computedSecret = computedPrivKey.GetBitcoinSecret(Network.TestNet);
-            // Console.WriteLine("Computed bitcoin sectret: " +computedSecret );
+            // ### Wallet management in C#
+            //generateAndSaveKeys();
 
             
             
+            // ### A little bit of vanity and proof-of-work
             
-            BitcoinSecret bitcoinSecretKey = new BitcoinSecret("cS2U4Nz7tjn2SeUJaqQ3VnUrVXjVWPZG4KJmb3ecPa7YWuJwoh37");
-            Key privateKey = bitcoinSecretKey.PrivateKey; // generate a random private key
+            //genVanityAddress("mmanwa", 6);
+
+            // ### Interact with QBitNinja blockchain indexer in C#
+            // 2. Download all information available for this transaction
+            //getMainNetTransactionInfo("7ddde9aa86476c5a9064535aa220cb84019874db9d356497ed89f31841138b16");
+
+            // 3. Download all information relative to your CoPay address
+           
+            //getTestnetAddressInfo("mjoSet79rvh2nQQzYWmFhzYeQYu3ZV1bYx");
+
+            // 5. Print the list of unspent transaction outputs
+            //getTestnetAdressUnspentBalance("mjoSet79rvh2nQQzYWmFhzYeQYu3ZV1bYx");
+
+            // ### Build your first bitcoin transaction in C#
+            //sendMoney();
+
+            monitorBlockConfirmations("ccc50aafe5b106f9ef7942e226a16b16614f25dee2c54f97d0a326626381d319", 20.0);
+            
+            
+            
+
+            // Our copay address with a few transactions:  n2obaQd1r3so39PFLMMm7yK4b146oK4Zpq
+            // Other copay addresses: muGuZLu5ZbgsGK3L8M1cnmznSupe7ahh6c
+            // Our address created with code that has some money in it: mtWoNV36TuoNzQDsfejZEoQAQhWxbnEfT2. Corresponding priv key: cS2U4Nz7tjn2SeUJaqQ3VnUrVXjVWPZG4KJmb3ecPa7YWuJwoh37
+            // Our vanity address is: mjoSet79rvh2nQQzYWmFhzYeQYu3ZV1bYx. Corresponding priv key: cW696MyvRj5a2BM42ijrUMMBZErDGs1m6uVTBLmSyoChS6TZuAqU
+
+        }
+        static void generateAndSaveKeys() {
+
+            // Generate new key
+            //var privateKey = new Key();  // cS2U4Nz7tjn2SeUJaqQ3VnUrVXjVWPZG4KJmb3ecPa7YWuJwoh37  or cW696MyvRj5a2BM42ijrUMMBZErDGs1m6uVTBLmSyoChS6TZuAqU
+
+            // Re-use our previously generated keys
+            BitcoinSecret useOldKey = new BitcoinSecret("cW696MyvRj5a2BM42ijrUMMBZErDGs1m6uVTBLmSyoChS6TZuAqU");
+            Key privateKey = useOldKey.PrivateKey; 
+            
+
             PubKey publicKey = privateKey.PubKey;
-            var publicKeyHash = publicKey.Hash;  // https://programmingblockchain.gitbook.io/programmingblockchain/bitcoin_transfer/bitcoin_address
-            BitcoinPubKeyAddress bitcoinPublicKey = publicKey.GetAddress(Network.TestNet); 
-            var address = publicKey.GetAddress(Network.TestNet);
-            var paymentScript = publicKeyHash.ScriptPubKey;  // https://programmingblockchain.gitbook.io/programmingblockchain/bitcoin_transfer/payment_script
+            var publicKeyHash = publicKey.Hash;  
+            System.IO.StreamWriter file = new System.IO.StreamWriter("Generated_Addresses.txt");
 
+            // TestNet
+            BitcoinSecret bitcoinSecretKey = privateKey.GetBitcoinSecret(Network.TestNet);
+            BitcoinPubKeyAddress address = publicKey.GetAddress(Network.TestNet);
+            var paymentScript = publicKeyHash.ScriptPubKey;  
+
+            Console.WriteLine("============================\nTestNet:");
             Console.WriteLine("Public Key: " + publicKey);
             Console.WriteLine("Address: " + address.ToString());
             Console.WriteLine("Private Key Bitcoin secret: " + bitcoinSecretKey);
 
-            System.IO.StreamWriter file = new System.IO.StreamWriter("Generated_Addresses.txt");
-            file.WriteLine("Private Key: " + bitcoinSecretKey);
+            file.WriteLine("\nTestNet:");
+            file.WriteLine("Private Key Bitcoin Secret: " + bitcoinSecretKey);
             file.WriteLine("Public key: " + publicKey);
             file.WriteLine("Address: " + address);
             file.WriteLine("Payment Script: " + paymentScript );
-            
+
+            // Main net
+            bitcoinSecretKey = privateKey.GetBitcoinSecret(Network.Main);
+            address = publicKey.GetAddress(Network.Main);
+            paymentScript = publicKeyHash.ScriptPubKey;  
+
+            Console.WriteLine("============================\nMainNet:");
+            Console.WriteLine("Public Key: " + publicKey);
+            Console.WriteLine("Address: " + address.ToString());
+            Console.WriteLine("Private Key Bitcoin secret: " + bitcoinSecretKey);
+
+            file.WriteLine("\nMain net:");
+            file.WriteLine("Private Key Bitcoin Secret: " + bitcoinSecretKey);
+            file.WriteLine("Public key: " + publicKey);
+            file.WriteLine("Address: " + address);
+            file.WriteLine("Payment Script: " + paymentScript );
+
             file.Close();
-
-            
-            //genVanityAddress("mmanwa", 6);
-            //getMainNetTransactionInfo();
-            // Our copay address with a few transactions:  n2obaQd1r3so39PFLMMm7yK4b146oK4Zpq
-            // Other copay addresses: muGuZLu5ZbgsGK3L8M1cnmznSupe7ahh6c
-            // Our address created with code that has some money in it: mtWoNV36TuoNzQDsfejZEoQAQhWxbnEfT2
-            getTestnetAddressInfo("mtWoNV36TuoNzQDsfejZEoQAQhWxbnEfT2");
-            getTestnetAdressUnspentBalance("mtWoNV36TuoNzQDsfejZEoQAQhWxbnEfT2");
-
-            //sendMoney();
-            
-            
-            
-
         }
 
         static void genVanityAddress(string vanity, int len) {
@@ -169,10 +198,9 @@ namespace BitApp
             return false;
         }
 
-        static void getMainNetTransactionInfo() {
+        static void getMainNetTransactionInfo(string transactionIdString) {
             QBitNinjaClient client = new QBitNinjaClient(Network.Main);
-            // Parse transaction id to NBitcoin.uint256 so the client can eat it
-            var transactionId = uint256.Parse("8678423e9437501e8c6c536b80240f101a74510331b7b1c09a6aa6c54aeb433e");
+            var transactionId = uint256.Parse(transactionIdString);
             QBitNinja.Client.Models.GetTransactionResponse transactionResponse = client.GetTransaction(transactionId).Result;
 
             NBitcoin.Transaction transaction = transactionResponse.Transaction;
@@ -219,13 +247,7 @@ namespace BitApp
 
         static void getTestnetAddressInfo(string addressString) {
             QBitNinjaClient client = new QBitNinjaClient(Network.TestNet);
-
             var wAddress = BitcoinAddress.Create(addressString, Network.TestNet);
-
-
-            
-            
-            
             QBitNinja.Client.Models.BalanceModel balanceModel = client.GetBalance(wAddress, false).Result;
             QBitNinja.Client.Models.BalanceSummary balanceSummary = client.GetBalanceSummary(wAddress).Result;
 
@@ -260,6 +282,7 @@ namespace BitApp
             QBitNinjaClient client = new QBitNinjaClient(Network.TestNet);
 
             var wAddress = BitcoinAddress.Create(addressString, Network.TestNet);
+            // Get only Unspent balances
             QBitNinja.Client.Models.BalanceModel balanceModel = client.GetBalance(wAddress, true).Result;
 
             Console.WriteLine("\n========================================================");
@@ -281,13 +304,16 @@ namespace BitApp
         }
 
 
-        static void sendMoney(/*string fromPrivateKey, string toPublicKey, double amount*/) {
-            BitcoinSecret bitcoinPrivateKey = new BitcoinSecret("cS2U4Nz7tjn2SeUJaqQ3VnUrVXjVWPZG4KJmb3ecPa7YWuJwoh37");
+        static void sendMoney() {
+            
+            BitcoinSecret bitcoinPrivateKey = new BitcoinSecret("cW696MyvRj5a2BM42ijrUMMBZErDGs1m6uVTBLmSyoChS6TZuAqU");  // Our vanity address
             var network = bitcoinPrivateKey.Network;
             var address = bitcoinPrivateKey.GetAddress();
 
             var client = new QBitNinjaClient(network);
-            var transactionId = uint256.Parse("ccc50aafe5b106f9ef7942e226a16b16614f25dee2c54f97d0a326626381d319");
+            // ccc50aafe5b106f9ef7942e226a16b16614f25dee2c54f97d0a326626381d319
+            // 87e3531cb875f49182c78538ce464e38c2034ab0c695e767f1acfc2a318ae333
+            var transactionId = uint256.Parse("87e3531cb875f49182c78538ce464e38c2034ab0c695e767f1acfc2a318ae333");
             var transactionResponse = client.GetTransaction(transactionId).Result;
             
             Console.WriteLine("Transaction ID: " + transactionResponse.TransactionId); 
@@ -307,43 +333,37 @@ namespace BitApp
                 throw new Exception("TxOut doesn't contain our ScriptPubKey");
             Console.WriteLine("We want to spend {0}. outpoint:", outPointToSpend.N + 1);
 
-            var transaction = Transaction.Create(network);
-            transaction.Inputs.Add(new TxIn()
-            {
-                PrevOut = outPointToSpend
-            });
-            var hallOfTheMakersAddress = BitcoinAddress.Create("muGuZLu5ZbgsGK3L8M1cnmznSupe7ahh6c", Network.TestNet);
-
             
-            // How much you want to spend
-            var hallOfTheMakersAmount = new Money(0.0004m, MoneyUnit.BTC);
-            // How much miner fee you want to pay
-            /* Depending on the market price and
-            * the currently advised mining fee,
-            * you may consider to increase or decrease it.
-            */
-            var minerFee = new Money(0.00007m, MoneyUnit.BTC);
-            // How much you want to get back as change
-            var txInAmount = (Money)receivedCoins[(int) outPointToSpend.N].Amount;
-            var changeAmount = txInAmount - hallOfTheMakersAmount - minerFee;
+            // From where to spend the money
+            var transaction = Transaction.Create(network);
+            transaction.Inputs.Add(new TxIn() { PrevOut = outPointToSpend });
+            
 
-            TxOut hallOfTheMakersTxOut = new TxOut()
-            {
-                Value = hallOfTheMakersAmount,
-                ScriptPubKey = hallOfTheMakersAddress.ScriptPubKey
+
+            // How much? 
+            var amountToSend = new Money(0.0004m, MoneyUnit.BTC);
+            var minerFee = new Money(0.00007m, MoneyUnit.BTC);
+
+            var txInAmount = (Money)receivedCoins[(int) outPointToSpend.N].Amount;
+            var changeAmount = txInAmount - amountToSend - minerFee;
+
+            // To where, and how much?
+            var receiverAddress = BitcoinAddress.Create("n2obaQd1r3so39PFLMMm7yK4b146oK4Zpq", Network.TestNet);
+            TxOut receiverTxOut = new TxOut() {
+                Value = amountToSend,
+                ScriptPubKey = receiverAddress.ScriptPubKey
             };
-            TxOut changeTxOut = new TxOut()
-            {
+            TxOut changeTxOut = new TxOut() {
                 Value = changeAmount,
                 ScriptPubKey = bitcoinPrivateKey.ScriptPubKey
             };
 
-            transaction.Outputs.Add(hallOfTheMakersTxOut);
+            transaction.Outputs.Add(receiverTxOut);
             transaction.Outputs.Add(changeTxOut);
 
             
             // Message
-            var message = "Long live NBitcoin and its makers!";
+            var message = "Hello world transaction!";
             var bytes = System.Text.Encoding.UTF8.GetBytes(message);
             transaction.Outputs.Add(new TxOut()
             {
@@ -360,15 +380,36 @@ namespace BitApp
 
 
             QBitNinja.Client.Models.BroadcastResponse broadcastResponse = client.Broadcast(transaction).Result;
-            if (!broadcastResponse.Success)
-            {
-                Console.Error.WriteLine("ErrorCode: " + broadcastResponse.Error.ErrorCode);
-                Console.Error.WriteLine("Error message: " + broadcastResponse.Error.Reason);
-            }
-            else
-            {
-                Console.WriteLine("Success! You can check out the hash of the transaciton in any block explorer:");
+            if (broadcastResponse.Success) {
+                Console.WriteLine("Success! Transaction successful:");
                 Console.WriteLine(transaction.GetHash());
+            } else {
+                Console.Error.WriteLine("ErrorCode: " + broadcastResponse.Error.ErrorCode);
+                Console.Error.WriteLine("Error message: " + broadcastResponse.Error.Reason);   
+            }
+
+        }
+
+        static void monitorBlockConfirmations(string transaction_id, double runForSeconds) {
+            
+            var client = new QBitNinjaClient(Network.TestNet);
+            DateTime begin = DateTime.Now;
+            var transactionId = uint256.Parse(transaction_id);
+            int oldNumConfirmations = 0;
+            DateTime now = DateTime.Now;
+            var seconds = (now - begin).TotalSeconds; 
+            
+            while (seconds < runForSeconds) {
+                var transactionResponse = client.GetTransaction(transactionId).Result;
+                int newNumConfirmations = transactionResponse.Block.Confirmations;
+                if (newNumConfirmations == oldNumConfirmations) {
+                    Console.WriteLine("Change in number of confirmations");    
+                    Console.WriteLine("Transaction ID: " + transactionResponse.TransactionId + ". Block confirmaitions: " + newNumConfirmations); 
+                    oldNumConfirmations = newNumConfirmations;
+                }
+                System.Threading.Thread.Sleep(2000);
+                now = DateTime.Now;
+                seconds = (now - begin).TotalSeconds; 
             }
 
         }
