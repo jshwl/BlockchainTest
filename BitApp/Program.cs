@@ -10,18 +10,18 @@ namespace BitApp
         {
             Console.WriteLine("Start program");
             Key privateKey;
-            string vanity = "jos";
+            string vanity = "jose";
             while(true){
                 privateKey = new Key();
                 var publicKey = privateKey.PubKey; // compute public key
-                //string pkstring = publicKey.ToString().Substring(0,4);
                 var testNetPrivateKey = privateKey.GetBitcoinSecret(Network.TestNet);
                 var address = publicKey.GetAddress(Network.TestNet);
-                string v_address = address.ToString().Substring(1,4);
+                string v_address = address.ToString().Substring(1,5);
                 Console.WriteLine("VanityAddress: \t" + v_address + "\t address:\t" + address);
                 if(vanity.Equals(v_address.ToLower())){
-                    Console.WriteLine("pubkey : \t\n" + publicKey);
+                    Console.WriteLine("public key : \t" + publicKey);
                     Console.WriteLine("TestNet private key: \t" + testNetPrivateKey);
+                    Console.WriteLine("Vanityzaddress:\t" + address);
                     break;
                 }
             }
