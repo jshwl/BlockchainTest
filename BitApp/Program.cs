@@ -10,28 +10,32 @@ namespace BitApp
         static void Main(string[] args)
         {
 
+            // ##################################################################
             // ### Wallet management in C#
-            //generateAndSaveKeys();
+            // ##################################################################
+            generateAndSaveKeys();
 
             
             
             // ### A little bit of vanity and proof-of-work
-            
             //genVanityAddress("mmanwa", 6);
 
+            // ##################################################################
             // ### Interact with QBitNinja blockchain indexer in C#
+            // ##################################################################
             // 2. Download all information available for this transaction
-            //getMainNetTransactionInfo("7ddde9aa86476c5a9064535aa220cb84019874db9d356497ed89f31841138b16");
+            getMainNetTransactionInfo("7ddde9aa86476c5a9064535aa220cb84019874db9d356497ed89f31841138b16");
 
             // 3. Download all information relative to your CoPay address
-           
-            //getTestnetAddressInfo("mjoSet79rvh2nQQzYWmFhzYeQYu3ZV1bYx");
+            getTestnetAddressInfo("mjoSet79rvh2nQQzYWmFhzYeQYu3ZV1bYx");
 
             // 5. Print the list of unspent transaction outputs
-            //getTestnetAdressUnspentBalance("mjoSet79rvh2nQQzYWmFhzYeQYu3ZV1bYx");
+            getTestnetAdressUnspentBalance("mjoSet79rvh2nQQzYWmFhzYeQYu3ZV1bYx");
 
+            // ##################################################################
             // ### Build your first bitcoin transaction in C#
-            //sendMoney();
+            // ##################################################################
+            sendMoney();
 
             monitorBlockConfirmations("ccc50aafe5b106f9ef7942e226a16b16614f25dee2c54f97d0a326626381d319", 20.0);
             
