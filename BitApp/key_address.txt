@@ -1,0 +1,2 @@
+TestNet Private key:    cW696MyvRj5a2BM42ijrUMMBZErDGs1m6uVTBLmSyoChS6TZuAqU
+Address:		mjoSet79rvh2nQQzYWmFhzYeQYu3ZV1bYx
